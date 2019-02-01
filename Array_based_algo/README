@@ -1,0 +1,10 @@
+1. count_zero.c  
+2. find_duplicate.c
+   - https://leetcode.com/problems/find-the-duplicate-number/
+3. matrix_search.c 
+   - https://leetcode.com/problems/search-a-2d-matrix/ 
+4. minInrotsortedarray.c
+   - https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/
+5. missingnumber.c 
+   - https://leetcode.com/problems/missing-number/
+6. print_diff_pattern.c : closest numbers hackerrank
