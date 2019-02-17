@@ -1,0 +1,33 @@
+
+typedef struct operand_stack {
+    int top;
+    char* array;
+    unsigned int capacity;
+}operand_stack;
+
+operand_stack* createStack(unsigned int capacity)
+{
+	operand_stack* stk = (operand_stack *)malloc(sizeof(operand_stack));
+	stk->top = -1;
+	stk->capacity = capacity;
+	stk->array = (char *)malloc(sizeof(char)*capacity);
+	return stk;
+}
+
+void push(operand_stack* stk, char ele)
+{
+	if (stk->top == stk->capacity)
+		return;
+	stk->array[++stk->top] = ele;
+}
+char pop(operand_stack* stk)
+{
+	if (stk->top == -1)
+		return INT_MIN;
+	int bkp = stk->array[stk->top--];
+	return bkp;
+}
+char peek(operand_stack* stk)
+{
+	return stk->array[stk->top];
+}
