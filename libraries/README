@@ -1,0 +1,125 @@
+Linux Library Types:
+==================
+
+There are two Linux C/C++ library types which can be created:
+
+1. Static libraries (.a): Library of object code which is linked with, and 
+   becomes part of the application.
+2. Dynamically linked shared object libraries (.so): There is only one form of 
+   this library but it can be used in two ways.
+    - Dynamically linked at run time. The libraries must be available during 
+      compile/link phase. 
+    - The shared objects are not included into the executable component 
+      but are tied to the execution.
+    - dynamically loaded/unloaded and linked during execution (i.e. browser plug-in) 
+      using the dynamic linking loader system functions.
+
+Library naming conventions:
+==========================
+Libraries are typically named with the prefix "lib". This is true for all the C 
+standard libraries. When linking, the command line reference to the library 
+will not contain the library prefix or suffix.
+
+Consider the following compile and link command: gcc src-file.c -lm -lpthread
+The libraries referenced in this example for inclusion during linking are the 
+math library ("m") and the thread library ("pthread"). They are found in 
+/usr/lib/libm.a and /usr/lib/libpthread.a.
+
+Note: The GNU compiler now has the command line option "-pthread" while older 
+versions of the compiler specify the pthread library explicitly with "-lpthread". 
+Thus now you are more likely to see gcc src-file.c -lm -pthread
+
+Static Libraries: (.a) 
+<-------------------->
+
+Generate of static library (object code archive file): 
+
+#gcc -Wall -c sum.c sub.c max.c min.c
+- Create library "libtest.a"
+- List files in library: ar -t libtest.a
+#ar -rcs libtest.a sum.o sub.o min.o max.o
+- Linking with the library: 
+gcc -o executable-name main_static.c libctest.a
+gcc -o executable-name main_static.c -L /path/to/library-directory -lctest
+Example:
+    #gcc main_static.c libtest.a -o main_static
+
+Dynamically Linked "Shared Object" Libraries: (.so) 
+<------------------------------------------------->
+Library creation example:
+
+#gcc -Wall -fPIC -c *.c
+#gcc -shared -Wl,-soname,libtest.so.1 -o libtest.so.1.0   *.o
+#mv libtest.so.1.0 /opt/lib
+#ln -sf /opt/lib/libtest.so.1.0 /opt/lib/libtest.so.1
+#ln -sf /opt/lib/libtest.so.1.0 /opt/lib/libtest.so
+    
+
+This creates the library libtest.so.1.0 and symbolic links to it.
+
+It is also valid to cascade the linkage:
+
+    ln -sf /opt/lib/libtest.so.1.0 /opt/lib/libtest.so.1
+    ln -sf /opt/lib/libtest.so.1   /opt/lib/libtest.so
+    
+
+Compiler options:
+
+    -Wall: include warnings. See man page for warnings specified.
+    -fPIC: Compiler directive to output position independent code, a characteristic required by shared libraries. Also see "-fpic".
+    -shared: Produce a shared object which can then be linked with other objects to form an executable.
+    -Wl,options: Pass options to linker.
+    In this example the options to be passed on to the linker are: 
+    "-soname libtest.so.1". The name passed with the "-o" option is passed to gcc.
+    Option -o: Output of operation. In this case the name of the shared object 
+    to be output will be "libtest.so.1.0"
+
+Library Links:
+
+    - The link to /opt/lib/libctest.so allows the naming convention for the 
+      compile flag -lctest to work.
+    - The link to /opt/lib/libctest.so.1 allows the run time binding to work. 
+
+###########################################################################
+-> Compiling for run-time linking with a dynamically linked libctest.so.1.0: 
+gcc -Wall -I /path/to/include-files -L /path/to/libraries main_dynamic.c -lctest -o main_dynamic
+Ex:-
+   # gcc -Wall -L /opt/lib main_dynamic.c -ltest -o main_dynamic
+
+Note:  - Where the name of the library is libtest.so. (This is why you must 
+         create the symbolic links or you will get the error "/usr/bin/ld: cannot find -lctest".)
+       - The libraries will NOT be included in the executable but will be dynamically 
+         linked during run-time execution. 
+==> The shared library dependencies of the executable can be listed with the command: ldd name-of-executable
+
+Example: ldd main_dynamic
+
+
+#####FIX############
+The fix is to resolve dependencies of the last two libraries when linking the library libname-of-lib.so:
+
+    -> Add the unresolved library path in /etc/ld.so.conf.d/name-of-lib-x86_64.conf and/or /etc/ld.so.conf.d/name-of-lib-i686.conf
+       Reload the library cache (/etc/ld.so.cache) with the command: sudo ldconfig
+    or
+    -> Add library and path explicitly to the compiler/linker command: -lname-of-lib -L/path/to/lib
+    or
+    -> Add the library path to the environment variable to fix run-time dependency:
+       export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/lib
+
+Run Program:
+
+    Set path: export LD_LIBRARY_PATH=/opt/lib:$LD_LIBRARY_PATH
+    Run: main_dynamic
+
+Example with code:
+=================
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/lib
+
+
+#################
+ You get the following error if the library path is not set: 
+ ./main_dynamic: error while loading shared libraries: libtest.so.1: cannot open shared object file: No such file or directory
+
+ Please follow this link http://www.yolinux.com/TUTORIALS/LibraryArchives-StaticAndDynamic.html for detailed info.
+
+           

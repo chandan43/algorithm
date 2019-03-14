@@ -1,0 +1,51 @@
+Library Path:
+============
+
+--> In order for an executable to find the required libraries to link with during 
+    run time, one must configure the system so that the libraries can be found. 
+    Methods available: (Do at least one of the following)
+    Add library directories to be included during dynamic linking to the file /etc/ld.so.conf
+    
+    Sample: /etc/ld.so.conf
+    /usr/X11R6/lib
+    /usr/lib
+    ...
+    ..
+    /usr/lib/sane
+    /usr/lib/mysql
+    /opt/lib
+              
+
+--> Add the library path to this file and then execute the command (as root) 
+    ldconfig to configure the linker run-time bindings.
+    You can use the "-f file-name" flag to reference another configuration file 
+    if you are developing for different environments.
+    See man page for command ldconfig.
+OR
+    Add specified directory to library cache: (as root)
+    ldconfig -n /opt/lib
+    Where /opt/lib is the directory containing your library libctest.so
+    (When developing and just adding your current directory: ldconfig -n . Link with -L.)
+
+    This will NOT permanently configure the system to include this directory. 
+    The information will be lost upon system reboot.
+
+OR
+
+    Specify the environment variable LD_LIBRARY_PATH to point to the directory 
+    paths containing the shared object library. This will specify to the run time 
+    loader that the library paths will be used during execution to resolve dependencies.
+    (Linux/Solaris: LD_LIBRARY_PATH, SGI: LD_LIBRARYN32_PATH, AIX: LIBPATH, Mac OS X: DYLD_LIBRARY_PATH, HP-UX: SHLIB_PATH)
+
+    Example (bash shell): export LD_LIBRARY_PATH=/opt/lib:$LD_LIBRARY_PATH or add to your ~/.bashrc file:
+    ...
+    if [ -d /opt/lib ];
+    then
+       LD_LIBRARY_PATH=/opt/lib:$LD_LIBRARY_PATH
+    fi
+    ...
+    export LD_LIBRARY_PATH
+    This instructs the run time loader to look in the path described by the 
+    environment variable LD_LIBRARY_PATH, to resolve shared libraries. 
+    This will include the path /opt/lib.
+
