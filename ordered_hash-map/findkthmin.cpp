@@ -32,19 +32,24 @@ public:
 	int temp = *num1;
 	*num1 = *num2;
 	*num2 = temp;
-    }   
+    }
+    void display(int* input, int len)
+    {
+        for(int i = 0; i < len; i++ ) {
+            cout << input[i] << "\t";
+        }
+        cout << endl;
+    }
     int partition(int* input, int start, int end)
     {
-        int j = start + 1;
-        int pvot = input[start];
+        int j = start;
         for (int i = start + 1; i <= end; i++){
-            if  (input[i] < pvot) {
-                 swap(&input[j], &input[i]);
-                  j = j+1;
+            if  (input[i] < input[start]) {
+                 swap(&input[++j], &input[i]);
             }
         } 
-        swap(&input[start],&input[j-1]);
-        return j - 1;
+        swap(&input[start],&input[j]);
+        return j;
     }
     void sort(int *arr, int start, int end)
     {
@@ -58,6 +63,7 @@ public:
     int FindKthminval2(int* input, int len, int k)
     {
         sort(input, 0, len-1);
+        display(input,len);
         return input[k-1];
     }
     /*TC : O(nlog)  SC: (n)*/
@@ -73,6 +79,24 @@ public:
         }
         return *itr;
     }
+    int auxFindKthminval4(int* input, int l, int r, int k)
+    {
+        while(l <= r) {
+            int p = partition(input, l ,r);
+            if (k == p+1)
+                return input[p];
+            if (k < p+1)
+                r = p - 1;
+            else {
+                l = p + 1;
+                k = p - l + 1;
+            }
+        }
+    }
+    int FindKthminval4(int* input,int len,int k)
+    {
+        return auxFindKthminval4(input,0,len,k);
+    }
 
 };
 
@@ -83,7 +107,8 @@ int main()
     int input[size] = {6, 9, 5, 1, 3, 2, 4};
     FindKthmin kmin;
     cout << kmin.FindKthminval3(input, size, k) << endl;
-    cout << kmin.FindKthminval2(input, size, k) << endl;
-    cout << kmin.FindKthminval1(input, size, k) << endl;
+    //cout << kmin.FindKthminval2(input, size, k) << endl;
+    //cout << kmin.FindKthminval1(input, size, k) << endl;
+    cout << kmin.FindKthminval4(input, size, k) << endl;
     return 0;
 }

@@ -26,6 +26,7 @@ public:
     int BTSize3(BTnode*);
     int BTdepth1(BTnode*);
     int BTdepth2(BTnode*);
+    int BTdepth3(BTnode*);
 };
 
 BTnode* BTnode:: NewBT(int data)
@@ -69,6 +70,31 @@ int BTnode:: BTSize1(BTnode* root)
     int ls = BTSize1(root->left);
     int rs = BTSize1(root->right);
     return ls + rs + 1;
+}
+/* TC:O(n) SC:O(n) */
+int BTnode:: BTdepth3(BTnode* root)
+{
+    queue <BTnode*> que;
+    int count = 0;
+    if (root) {
+        que.push(root);
+        que.push(NULL);
+    }
+    while(!que.empty()) {
+        BTnode* temp = que.front();
+        que.pop();
+        if (!temp) {
+            count++;
+            if (!que.empty())
+                que.push(NULL);
+        } else {
+            if (temp->left)
+                que.push(temp->left);
+            if (temp->right)
+                que.push(temp->right);
+        }
+    }
+    return count;
 }
 /* TC:O(n) SC:O(n) */
 int BTnode:: BTSize2(BTnode* root)
@@ -174,6 +200,7 @@ int* BTnode:: createUniqueBT(int n)
     cout << "BTSize3:: " << BTSize3(root)<<endl;
     cout << "Tree Depth1: " << BTdepth1(root)<< endl;
     cout << "Tree Depth2: " << BTdepth2(root)<< endl;
+    cout << "Tree Depth3: " << BTdepth3(root)<< endl;
     return arr;
 }
 int main()
